@@ -88,7 +88,7 @@ public class WordCountTopology {
         @Override
         public void declareOutputFields(OutputFieldsDeclarer declarer) {
             declarer.declare(new Fields("word", "count"));
-        }
+    }
     }
 
     public static class WordCountReport extends BaseBasicBolt {
