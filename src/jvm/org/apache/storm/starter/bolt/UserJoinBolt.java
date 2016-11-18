@@ -12,25 +12,25 @@ import org.apache.storm.utils.TimeCacheMap;
 
 import java.util.*;
 
-public class SingleJoinBolt extends BaseRichBolt {
-
+/**
+ * User: shijingui
+ * Date: 2016/11/17
+ */
+public class UserJoinBolt extends BaseRichBolt {
     private OutputCollector collector;
-    private Fields idFields;
     private Fields outFields;
-    private int numSources;
-    private TimeCacheMap<List<Object>, Map<GlobalStreamId, Tuple>> _pending;
-    private Map<String, GlobalStreamId> fieldLocations;
+    Map<String, GlobalStreamId> fieldLocations;
+    Fields idFields;
+    int numSources;
+    TimeCacheMap<List<Object>, Map<GlobalStreamId, Tuple>> pending;
 
-    public SingleJoinBolt(Fields outFields) {
-        this.outFields = outFields;
-    }
 
-    @Override
     public void prepare(Map conf, TopologyContext context, OutputCollector collector) {
+
         fieldLocations = new HashMap<String, GlobalStreamId>();
         this.collector = collector;
         int timeout = ((Number) conf.get(Config.TOPOLOGY_MESSAGE_TIMEOUT_SECS)).intValue();
-        _pending = new TimeCacheMap<List<Object>, Map<GlobalStreamId, Tuple>>(timeout, new ExpireCallback());
+        pending = new TimeCacheMap<List<Object>, Map<GlobalStreamId, Tuple>>(timeout, new ExpireCallback());
         numSources = context.getThisSources().size();
         Set<String> idFields = null;
         for (GlobalStreamId source : context.getThisSources().keySet()) {
@@ -54,22 +54,27 @@ public class SingleJoinBolt extends BaseRichBolt {
         if (fieldLocations.size() != outFields.size()) {
             throw new RuntimeException("Cannot find all outfields among sources");
         }
+
     }
 
-    @Override
-    public void execute(Tuple tuple) {
-        List<Object> id = tuple.select(idFields);
-        GlobalStreamId streamId = new GlobalStreamId(tuple.getSourceComponent(), tuple.getSourceStreamId());
+    public UserJoinBolt(Fields fields) {
+        this.outFields = fields;
+    }
 
-        if (!_pending.containsKey(id)) {
-            _pending.put(id, new HashMap<GlobalStreamId, Tuple>());
+    public void execute(Tuple tuple) {
+        List<Object> ids = tuple.select(idFields);
+        GlobalStreamId streamId = new GlobalStreamId(tuple.getSourceComponent(), tuple.getSourceStreamId());
+        if (!pending.containsKey(ids)) {
+            pending.put(ids, new HashMap<GlobalStreamId, Tuple>());
         }
-        Map<GlobalStreamId, Tuple> parts = _pending.get(id);
-        if (parts.containsKey(streamId))
-            throw new RuntimeException("Received same side of single join twice");
-        parts.put(streamId, tuple);
+        Map<GlobalStreamId, Tuple> parts = pending.get(ids);
+        if (parts.containsKey(streamId)) {
+            //throw new RuntimeException("Received same side of single join twice");
+        } else
+            parts.put(streamId, tuple);
+
         if (parts.size() == numSources) {
-            _pending.remove(id);
+            pending.remove(ids);
             List<Object> joinResult = new ArrayList<Object>();
             for (String outField : outFields) {
                 GlobalStreamId loc = fieldLocations.get(outField);
@@ -81,12 +86,21 @@ public class SingleJoinBolt extends BaseRichBolt {
                 collector.ack(part);
             }
         }
+
+//        int id = tuple.getIntegerByField("id");
+//        String password = tuple.getStringByField("password");
+//        String nickName = tuple.getStringByField("nickName");
+
+
+//        System.out.println("user join info={id:" + id + ",password:" + password + ",nickName:" + nickName + "}");
+
     }
 
-    @Override
+
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
         declarer.declare(outFields);
     }
+
 
     private class ExpireCallback implements TimeCacheMap.ExpiredCallback<List<Object>, Map<GlobalStreamId, Tuple>> {
         @Override

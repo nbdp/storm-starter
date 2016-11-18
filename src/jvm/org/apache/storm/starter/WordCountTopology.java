@@ -26,7 +26,7 @@ public class WordCountTopology {
         builder.setSpout("spout", new RandomSentenceSpout(), 1);
         //bolt
         builder.setBolt("split", new SplitSentence(), 1).shuffleGrouping("spout");
-        builder.setBolt("count", new WordCount(), 1).fieldsGrouping("split", new Fields("word"));
+        builder.setBolt("count", new WordCount(), 2).fieldsGrouping(("split"), new Fields("word"));
         builder.setBolt("report", new WordCountReport(), 1).shuffleGrouping("count");
 
         Config conf = new Config();
@@ -36,7 +36,7 @@ public class WordCountTopology {
             conf.setNumWorkers(3);
             StormSubmitter.submitTopologyWithProgressBar(args[0], conf, builder.createTopology());
         } else {
-            conf.setMaxTaskParallelism(1);
+//            conf.setMaxTaskParallelism(1);
 
             LocalCluster cluster = new LocalCluster();
             cluster.submitTopology("word-count", conf, builder.createTopology());
@@ -88,7 +88,7 @@ public class WordCountTopology {
         @Override
         public void declareOutputFields(OutputFieldsDeclarer declarer) {
             declarer.declare(new Fields("word", "count"));
-    }
+        }
     }
 
     public static class WordCountReport extends BaseBasicBolt {
@@ -97,7 +97,7 @@ public class WordCountTopology {
         public void execute(Tuple input, BasicOutputCollector collector) {
             String word = input.getStringByField("word");
             Long count = input.getLongByField("count");
-            System.out.println(word + ":::" + count);
+            System.out.println("===================【" + word + "】" + ":::" + count);
         }
 
         @Override

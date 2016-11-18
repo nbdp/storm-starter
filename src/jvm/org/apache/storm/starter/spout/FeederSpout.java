@@ -51,15 +51,12 @@ public class FeederSpout extends BaseRichSpout {
 
     public void nextTuple() {
         List<Object> toEmit = (List<Object>) InprocMessaging.pollMessage(id);
-        System.out.println("--------------执行----------------");
         if (toEmit != null) {
             List<Object> tuple = (List<Object>) toEmit.get(0);
             Object msgId = toEmit.get(1);
-            System.out.println("--------------tuple size:::" + tuple.size());
             collector.emit(tuple, msgId);
         } else {
             try {
-                System.out.println("--------------spout没有数据----------------");
                 Thread.sleep(1);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
