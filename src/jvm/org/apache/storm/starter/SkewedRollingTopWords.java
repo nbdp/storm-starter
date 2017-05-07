@@ -61,24 +61,24 @@ public class SkewedRollingTopWords {
 
     /**
      * Submits (runs) the topology.
-     *
+     * <p>
      * Usage: "RollingTopWords [topology-name] [local|remote]"
-     *
+     * <p>
      * By default, the topology is run locally under the name "slidingWindowCounts".
-     *
+     * <p>
      * Examples:
-     *
+     * <p>
      * ```
-     *
+     * <p>
      * # Runs in local mode (LocalCluster), with topology name "slidingWindowCounts"
      * $ storm jar storm-starter-jar-with-dependencies.jar org.apache.storm.starter.RollingTopWords
-     *
+     * <p>
      * # Runs in local mode (LocalCluster), with topology name "foobar"
      * $ storm jar storm-starter-jar-with-dependencies.jar org.apache.storm.starter.RollingTopWords foobar
-     *
+     * <p>
      * # Runs in local mode (LocalCluster), with topology name "foobar"
      * $ storm jar storm-starter-jar-with-dependencies.jar org.apache.storm.starter.RollingTopWords foobar local
-     *
+     * <p>
      * # Runs in remote/cluster mode, with topology name "production-topology"
      * $ storm jar storm-starter-jar-with-dependencies.jar org.apache.storm.starter.RollingTopWords production-topology remote
      * ```

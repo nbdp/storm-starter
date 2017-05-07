@@ -59,7 +59,6 @@ public class RankableObjectWithFields implements Rankable, Serializable {
      * extracted and tracked, too. These fields can be accessed via {@link RankableObjectWithFields#getFields()}.
      *
      * @param tuple
-     *
      * @return new instance based on the provided tuple
      */
     public static RankableObjectWithFields from(Tuple tuple) {

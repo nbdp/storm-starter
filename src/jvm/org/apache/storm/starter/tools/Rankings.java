@@ -45,6 +45,7 @@ public class Rankings implements Serializable {
 
     /**
      * Copy constructor.
+     *
      * @param other
      */
     public Rankings(Rankings other) {

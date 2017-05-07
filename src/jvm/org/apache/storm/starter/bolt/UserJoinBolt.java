@@ -17,13 +17,17 @@ import java.util.*;
  * Date: 2016/11/17
  */
 public class UserJoinBolt extends BaseRichBolt {
-    private OutputCollector collector;
-    private Fields outFields;
     Map<String, GlobalStreamId> fieldLocations;
     Fields idFields;
     int numSources;
     TimeCacheMap<List<Object>, Map<GlobalStreamId, Tuple>> pending;
+    private OutputCollector collector;
+    private Fields outFields;
 
+
+    public UserJoinBolt(Fields fields) {
+        this.outFields = fields;
+    }
 
     public void prepare(Map conf, TopologyContext context, OutputCollector collector) {
 
@@ -55,10 +59,6 @@ public class UserJoinBolt extends BaseRichBolt {
             throw new RuntimeException("Cannot find all outfields among sources");
         }
 
-    }
-
-    public UserJoinBolt(Fields fields) {
-        this.outFields = fields;
     }
 
     public void execute(Tuple tuple) {

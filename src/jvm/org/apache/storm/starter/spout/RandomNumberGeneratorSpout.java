@@ -32,7 +32,6 @@ import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * This spout generates random whole numbers with given {@code maxNumber} value as maximum with the given {@code fields}.
- *
  */
 public class RandomNumberGeneratorSpout implements IBatchSpout {
     private final Fields fields;
